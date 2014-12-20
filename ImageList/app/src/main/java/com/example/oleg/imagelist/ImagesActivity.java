@@ -1,7 +1,8 @@
 package com.example.oleg.imagelist;
 
-import android.support.v7.app.ActionBarActivity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -36,4 +37,21 @@ public class ImagesActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        InetHandler.getInstance().Start(this);
+    }
+
+    public void showAuthActivity() {
+
+
+        Intent intent = new Intent(this, AuthenticationActivity.class);
+        this.startActivity(intent);
+    }
+
+
+
+
 }
