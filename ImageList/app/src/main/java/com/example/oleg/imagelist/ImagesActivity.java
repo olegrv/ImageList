@@ -13,6 +13,7 @@ public class ImagesActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_images);
+
     }
 
 
@@ -42,6 +43,8 @@ public class ImagesActivity extends ActionBarActivity {
     protected void onStart() {
         super.onStart();
         InetHandler.getInstance().Start(this);
+        FileHandler.getInstance().setContext(this);
+
     }
 
     public void showAuthActivity() {

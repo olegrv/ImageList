@@ -150,6 +150,7 @@ public class InetHandler  {
                     m_strMaxTagID = getNextMaxTagID(JSONText);
                     m_strUrl = getNextURL(JSONText);
                     InstPicture instPicture = getPicture(JSONText);
+                    FileHandler.getInstance().addPicture(instPicture);
 
                 }
                 catch (Exception e)
