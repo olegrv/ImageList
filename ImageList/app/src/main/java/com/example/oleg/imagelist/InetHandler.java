@@ -55,11 +55,11 @@ public class InetHandler  {
         private String m_strToken = null;
         private String m_strUrl = null;
         private String m_strHashTag = "umbrella";
-        private String m_strMaxTagID = "0";
+        private String m_strMinTagID = "0";
         private String m_strCount = "1";
         public FetchImages(String strToken) {
             m_strToken = strToken;
-            m_strUrl = "https://api.instagram.com/v1/tags/umbrella/media/recent?access_token="+m_strToken +"&count="+m_strCount+"&max_tag_id="+ m_strMaxTagID;
+            m_strUrl = "https://api.instagram.com/v1/tags/umbrella/media/recent?access_token="+m_strToken +"&count="+m_strCount+"&max_tag_id="+ m_strMinTagID;
 
         }
         private  String convertInputStreamToString(InputStream inputStream) throws IOException{
@@ -88,10 +88,10 @@ public class InetHandler  {
             return strJSONText;
         }
 
-        private String getNextMaxTagID(String JSONText) throws JSONException
+        private String getNextMinTagID(String JSONText) throws JSONException
         {
             String strTagPagination = "pagination";
-            String strTagMaxID = "next_max_tag_id";
+            String strTagMaxID = "min_tag_id";
             JSONObject jObject = new JSONObject(JSONText);
 
             return jObject.getJSONObject(strTagPagination).getString(strTagMaxID);
@@ -148,7 +148,7 @@ public class InetHandler  {
             while(true) {
                 try {
                     String JSONText = getJSON(m_strUrl);
-                    m_strMaxTagID = getNextMaxTagID(JSONText);
+                    m_strMinTagID = getNextMinTagID(JSONText);
                     m_strUrl = getNextURL(JSONText);
                     InstPicture instPicture = getPicture(JSONText);
                     FileHandler.getInstance().addPicture(instPicture);
