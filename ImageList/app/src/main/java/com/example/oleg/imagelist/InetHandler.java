@@ -20,6 +20,7 @@ import java.util.ArrayList;
 public class InetHandler  {
 
     private static InetHandler m_instance = null;
+    private final float scaleFactor = 0.7f;
 
     private InetHandler(){};
 
@@ -135,7 +136,7 @@ public class InetHandler  {
             inputStream = httpResponse.getEntity().getContent();
             bitmap = BitmapFactory.decodeStream(inputStream);
 
-            InstPicture instPicture = new InstPicture(bitmap,tags);
+            InstPicture instPicture = new InstPicture(Util.getResizedBitmap(bitmap,scaleFactor),tags);
 
             return instPicture;
 
