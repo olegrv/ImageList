@@ -3,7 +3,6 @@ package com.example.oleg.imagelist;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -11,7 +10,6 @@ import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class FileHandler {
 
@@ -20,14 +18,13 @@ public class FileHandler {
 
     private FileHandler() {
 
-
     }
 
-    ;
     private final int NOT_INIT_PICNUMPER = -1;
     private int m_nLastPictureNumber = NOT_INIT_PICNUMPER;
     private final String m_strCountFileName = "count.bin";
     private final String m_strExtJpeg = ".jpeg";
+    private final String m_strExtHeight = ".bin";
     private final String m_strExtTags = ".txt";
     private final String SPLIT_SYMBOL = ";";
 
@@ -41,6 +38,10 @@ public class FileHandler {
     public synchronized void setContext(Context context) {
         m_context = context;
 
+    }
+    public Context getContext()
+    {
+        return  m_context;
     }
 
     private void checkPictureNumber() {
@@ -59,7 +60,6 @@ public class FileHandler {
 
 
             FileOutputStream fos = m_context.openFileOutput(m_strCountFileName, Context.MODE_PRIVATE);
-            //fos.getChannel().size();
 
             DataOutputStream dos = new DataOutputStream(fos);
             dos.writeInt(m_nLastPictureNumber);
@@ -100,15 +100,18 @@ public class FileHandler {
         checkPictureNumber();
         try {
 
-            String strJpegFileName = (m_nLastPictureNumber + 1) + m_strExtJpeg;
-            String strTagsFileName = (m_nLastPictureNumber + 1) + m_strExtTags;
+            String strJpegFileName = m_nLastPictureNumber  + m_strExtJpeg;
+            String strTagsFileName = m_nLastPictureNumber + m_strExtTags;
+            String strHeightName = m_nLastPictureNumber + m_strExtHeight;
 
             FileOutputStream fosJpeg = m_context.openFileOutput(strJpegFileName, Context.MODE_PRIVATE);
             FileOutputStream fosTags = m_context.openFileOutput(strTagsFileName, Context.MODE_PRIVATE);
+            FileOutputStream fosHeight = m_context.openFileOutput(strHeightName, Context.MODE_PRIVATE);
 
 
             DataOutputStream dosJpeg = new DataOutputStream(fosJpeg);
             DataOutputStream dosTags = new DataOutputStream(fosTags);
+            DataOutputStream dosHeight = new DataOutputStream(fosHeight);
 
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             instPicture.getBitmap().compress(Bitmap.CompressFormat.JPEG, 75, stream);
@@ -121,6 +124,8 @@ public class FileHandler {
                 strAllTags += instPicture.getTags().get(i) + ((instPicture.getTags().size() == i) ? "" : SPLIT_SYMBOL);
 
             dosTags.writeUTF(strAllTags);
+
+            dosHeight.writeInt(instPicture.getHeight());
 
             dosJpeg.close();
             dosTags.close();
@@ -135,37 +140,30 @@ public class FileHandler {
     }
 
     public synchronized InstPicture getPictureByID(int index) {
+        checkPictureNumber();
         InstPicture instPicture = null;
         try {
 
             String strJpegFileName = index + m_strExtJpeg;
             String strTagsFileName = index + m_strExtTags;
+            String strHeightFileName = index + m_strExtHeight;
 
-            FileInputStream fisJpeg = m_context.openFileInput(strJpegFileName);
-            FileInputStream fisTags = m_context.openFileInput(strTagsFileName);
+            FileInputStream fis = m_context.openFileInput(m_strCountFileName);
+            DataInputStream dis = new DataInputStream(fis);
 
+            int height = dis.readInt();
 
-            DataInputStream disTags = new DataInputStream(fisTags);
+            dis.close();
+            fis.close();
 
-
-            Bitmap bitmap = BitmapFactory.decodeStream(fisJpeg);
-
-            String str = disTags.readUTF();
-
-
-            ArrayList<String> tags = new ArrayList<String>();
-
-            String [] strs = str.split(SPLIT_SYMBOL);
-
-            for(int i =0; i<strs.length;i++)
-                tags.add(strs[i]);
-
-          instPicture  =  new InstPicture(bitmap,tags);
+          instPicture  =  new InstPicture(height,strJpegFileName,strTagsFileName);
         } catch (IOException e) {
             ;
         }
         return instPicture;
 
     }
+
+
 
 }

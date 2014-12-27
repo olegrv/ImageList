@@ -16,10 +16,12 @@ public class MyCustomGrid extends View {
     private GestureDetector gestureDetector = null;
     private final int HGAP = 3;
     private final int WGAP = 5;
+    private Context m_context=null;
 
 
     public MyCustomGrid(Context context, AttributeSet attrs) {
         super(context, attrs);
+        m_context = context;
         gestureDetector = new GestureDetector(context, new MyGestureListener());
     }
 
@@ -29,7 +31,7 @@ public class MyCustomGrid extends View {
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY)
         {
             //scrollBy((int)distanceX, (int)distanceY);
-            m_distanceY-=distanceY;
+            m_distanceY+=distanceY;
             invalidate();
             return true;
         }
@@ -66,22 +68,33 @@ public class MyCustomGrid extends View {
             InstPicture instPicture = FileHandler.getInstance().getPictureByID(i);
             if(null == instPicture)
                 continue;
-
-            float x_size = instPicture.getBitmap().getWidth();
-            float y_size = instPicture.getBitmap().getHeight();
-            canvas.drawBitmap (instPicture.getBitmap(), x_size*wcount+WGAP,currentHeight+m_distanceY ,paint);
-            currentHeight+=y_size+HGAP;
-            for(int j=instPicture.getTags().size()-1;j!=0;j--)
-
+            if(currentHeight <  m_distanceY-heightCanvas)
             {
-                Rect bounds = new Rect();
-                paint.getTextBounds(instPicture.getTags().get(j), 0, instPicture.getTags().get(j).length(), bounds);
-                currentHeight+=bounds.height()+HGAP;
-                canvas.drawText(instPicture.getTags().get(j), x_size*wcount+WGAP, currentHeight+m_distanceY,paint);
-
+                currentHeight+=instPicture.getHeight();
             }
-            if(currentHeight > heightCanvas-m_distanceY && wcount==(wsize-1))
+            else  if(currentHeight >=  m_distanceY-heightCanvas && currentHeight < m_distanceY+heightCanvas*2) {
+
+                if(!instPicture.isDataLoaded())
+                    instPicture.loadData();
+
+                float x_size = instPicture.getBitmap().getWidth();
+                float y_size = instPicture.getBitmap().getHeight();
+                canvas.drawBitmap(instPicture.getBitmap(), x_size * wcount + WGAP, currentHeight - m_distanceY, paint);
+                currentHeight += y_size + HGAP;
+                for (int j = instPicture.getTags().size() - 1; j != 0; j--)
+
+                {
+                    Rect bounds = new Rect();
+                    paint.getTextBounds(instPicture.getTags().get(j), 0, instPicture.getTags().get(j).length(), bounds);
+                    currentHeight += bounds.height() + HGAP;
+                    canvas.drawText(instPicture.getTags().get(j), x_size * wcount + WGAP, currentHeight - m_distanceY, paint);
+
+                }
+            }
+            else {
                 break;
+            }
+
             Heights[wcount] = currentHeight;
             wcount = (wcount==(wsize-1))?0:wcount+1;
 
