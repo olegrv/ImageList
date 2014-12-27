@@ -1,11 +1,13 @@
 package com.example.oleg.imagelist;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Rect;
+import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -16,7 +18,7 @@ public class MyCustomGrid extends View {
     private GestureDetector gestureDetector = null;
     private float m_lastPoint = -1;
     private final int HGAP = 3;
-    private final int WGAP = 5;
+    private final int WGAP = 15;
     private Context m_context=null;
 
 
@@ -83,13 +85,20 @@ public class MyCustomGrid extends View {
         Paint paint=new Paint();
         int widthCanvas = canvas.getWidth();
         int heightCanvas = canvas.getHeight();
+        float width_image = widthCanvas/wsize-WGAP;
+
         float []Heights = {0,0,0,0,0};
 
+        DisplayMetrics metrics = new DisplayMetrics();
+        ((Activity)getContext()).getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
         int countImages = FileHandler.getInstance().getCount();
+        float currentWidth = WGAP;
         for(int i=0;i<countImages;i++)
         {
 
             float currentHeight = Heights[wcount];
+
             InstPicture instPicture = FileHandler.getInstance().getPictureByID(i);
             if(null == instPicture)
                 continue;
@@ -102,28 +111,23 @@ public class MyCustomGrid extends View {
                 if(!instPicture.isDataLoaded())
                     instPicture.loadData();
 
-                float x_size = instPicture.getBitmap().getWidth();
-                float y_size = instPicture.getBitmap().getHeight();
-                canvas.drawBitmap(instPicture.getBitmap(), x_size * wcount + WGAP, currentHeight - m_distanceY, paint);
-                canvas.drawText(String.valueOf(i), x_size * wcount + WGAP, currentHeight - m_distanceY+y_size/2, paint);
-                currentHeight += y_size + HGAP;
-                for (int j = instPicture.getTags().size() - 1; j != 0; j--)
-
-                {
-                    Rect bounds = new Rect();
-                    paint.getTextBounds(instPicture.getTags().get(j), 0, instPicture.getTags().get(j).length(), bounds);
-                    currentHeight += bounds.height() + HGAP;
-                    canvas.drawText(instPicture.getTags().get(j), x_size * wcount + WGAP, currentHeight - m_distanceY, paint);
-
-                }
+                instPicture.draw(canvas,new RectF(currentWidth,currentHeight-m_distanceY,currentWidth+width_image,currentHeight-m_distanceY+instPicture.getHeight()*(width_image/instPicture.getWidth())),metrics);
+                currentHeight+=instPicture.getHeight()+HGAP;
+                currentWidth += width_image + WGAP;
             }
             else {
                 if(wcount==(wsize-1))
                     break; // all row was showed
             }
 
-            Heights[wcount] = currentHeight;
-            wcount = (wcount==(wsize-1))?0:wcount+1;
+            Heights[wcount] = currentHeight+50;
+            if(wcount==(wsize-1))
+            {
+                wcount = 0;
+                currentWidth = WGAP;
+            }
+            else
+                wcount++;
 
         }
     }
