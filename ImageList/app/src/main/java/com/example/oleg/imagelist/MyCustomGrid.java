@@ -104,7 +104,8 @@ public class MyCustomGrid extends View {
                 continue;
             if(currentHeight <  m_distanceY-heightCanvas)
             {
-                currentHeight+=instPicture.getHeight();
+                currentHeight+=instPicture.getHeight()*(width_image/instPicture.getWidth());
+                currentWidth += width_image + WGAP;
             }
             else  if(currentHeight >=  m_distanceY-heightCanvas && currentHeight < m_distanceY+heightCanvas*2) {
 
@@ -116,8 +117,9 @@ public class MyCustomGrid extends View {
                 currentWidth += width_image + WGAP;
             }
             else {
-                if(wcount==(wsize-1))
+                if(wcount==(wsize-1)) {
                     break; // all row was showed
+                }
             }
 
             Heights[wcount] = currentHeight+50;

@@ -18,6 +18,7 @@ import java.util.ArrayList;
 public class InstPicture {
     private static final java.lang.String SPLIT_SYMBOL =";" ;
     private static final int HGAP = 3;
+    private  int m_width = 0;
     private  Bitmap m_bitmap = null;
     private  ArrayList<String> m_tags = null;
     private int m_height = 0;
@@ -29,12 +30,13 @@ public class InstPicture {
         m_bitmap = bitmap;
         m_tags = tags;
 
-        calcHeight();
+        calcHeightAndWidth();
     }
 
-    public InstPicture(int height, String strJpegFileName, String strTagsFileName)
+    public InstPicture(int width ,int height, String strJpegFileName, String strTagsFileName)
     {
         m_height = height;
+        m_width = width;
 
         m_strTagsFileName = strTagsFileName;
         m_strJpegFileName = strJpegFileName;
@@ -45,7 +47,7 @@ public class InstPicture {
         return m_bitmap;
     }
 
-    private void calcHeight() {
+    private void calcHeightAndWidth() {
 
 
         Paint paint = new Paint();
@@ -62,6 +64,7 @@ public class InstPicture {
 
         }
         m_height = currentHeight;
+        m_width = m_bitmap.getWidth();
 
     }
 
@@ -143,6 +146,6 @@ public class InstPicture {
 
     public int getWidth() {
 
-        return m_bitmap.getWidth();
+        return m_width;
     }
 }

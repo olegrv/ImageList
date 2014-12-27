@@ -126,6 +126,7 @@ public class FileHandler {
             dosTags.writeUTF(strAllTags);
 
             dosHeight.writeInt(instPicture.getHeight());
+            dosHeight.writeInt(instPicture.getWidth());
 
             dosJpeg.close();
             dosTags.close();
@@ -152,11 +153,12 @@ public class FileHandler {
             DataInputStream dis = new DataInputStream(fis);
 
             int height = dis.readInt();
+            int width = dis.readInt();
 
             dis.close();
             fis.close();
 
-          instPicture  =  new InstPicture(height,strJpegFileName,strTagsFileName);
+          instPicture  =  new InstPicture(width,height,strJpegFileName,strTagsFileName);
         } catch (IOException e) {
             ;
         }
