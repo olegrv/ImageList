@@ -148,7 +148,7 @@ public class FileHandler {
             String strTagsFileName = index + m_strExtTags;
             String strHeightFileName = index + m_strExtHeight;
 
-            FileInputStream fis = m_context.openFileInput(m_strCountFileName);
+            FileInputStream fis = m_context.openFileInput(strHeightFileName);
             DataInputStream dis = new DataInputStream(fis);
 
             int height = dis.readInt();
