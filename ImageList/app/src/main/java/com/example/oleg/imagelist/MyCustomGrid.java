@@ -14,6 +14,7 @@ public class MyCustomGrid extends View {
     private float m_distanceY = 0;
     private final boolean m_vertical = true;
     private GestureDetector gestureDetector = null;
+    private float m_lastPoint = -1;
     private final int HGAP = 3;
     private final int WGAP = 5;
     private Context m_context=null;
@@ -25,23 +26,47 @@ public class MyCustomGrid extends View {
         gestureDetector = new GestureDetector(context, new MyGestureListener());
     }
 
-    private class MyGestureListener extends GestureDetector.SimpleOnGestureListener
-    {
+    private class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
+
+
+
+
         @Override
-        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY)
-        {
-            //scrollBy((int)distanceX, (int)distanceY);
-            m_distanceY+=distanceY;
-            invalidate();
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            m_distanceY +=velocityY;
             return true;
         }
+
+
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event)
     {
 
-         gestureDetector.onTouchEvent(event);
+         int action = event.getActionMasked();
+        float currentY = event.getY();
+
+        switch(action)
+                {
+        case MotionEvent.ACTION_UP:
+            m_distanceY+= m_lastPoint-currentY;
+            m_lastPoint = currentY;
+            invalidate();
+            break;
+        case MotionEvent.ACTION_DOWN:
+            m_lastPoint = currentY;
+           break;
+        case MotionEvent.ACTION_MOVE:
+            m_distanceY+= m_lastPoint-currentY;
+            m_lastPoint = currentY;
+            invalidate();
+            break;
+        default:
+            break;
+
+            }
+
             return true;
 
 
@@ -80,6 +105,7 @@ public class MyCustomGrid extends View {
                 float x_size = instPicture.getBitmap().getWidth();
                 float y_size = instPicture.getBitmap().getHeight();
                 canvas.drawBitmap(instPicture.getBitmap(), x_size * wcount + WGAP, currentHeight - m_distanceY, paint);
+                canvas.drawText(String.valueOf(i), x_size * wcount + WGAP, currentHeight - m_distanceY+y_size/2, paint);
                 currentHeight += y_size + HGAP;
                 for (int j = instPicture.getTags().size() - 1; j != 0; j--)
 
@@ -92,7 +118,8 @@ public class MyCustomGrid extends View {
                 }
             }
             else {
-                break;
+                if(wcount==(wsize-1))
+                    break; // all row was showed
             }
 
             Heights[wcount] = currentHeight;
