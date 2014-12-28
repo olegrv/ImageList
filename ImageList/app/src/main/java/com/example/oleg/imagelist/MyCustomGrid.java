@@ -3,6 +3,7 @@ package com.example.oleg.imagelist;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
@@ -14,7 +15,7 @@ import android.view.View;
 
 public class MyCustomGrid extends View {
     private float m_distanceY = 0;
-    private final boolean m_vertical = true;
+    private boolean m_vertical = true;
     private GestureDetector gestureDetector = null;
     private float m_lastPoint = -1;
     private final int HGAP = 3;
@@ -74,6 +75,17 @@ public class MyCustomGrid extends View {
 
 
 
+    }
+
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+
+            m_vertical = true;
+        } else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+
+            m_vertical = false;
+        }
     }
 
     @Override
