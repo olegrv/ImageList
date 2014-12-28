@@ -21,6 +21,7 @@ public class MyCustomGrid extends View {
     private final int HGAP = 3;
     private final int WGAP = 15;
     private Context m_context=null;
+    private Thread m_threadFling = null;
 
 
     public MyCustomGrid(Context context, AttributeSet attrs) {
@@ -37,20 +38,21 @@ public class MyCustomGrid extends View {
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
 
-            final int countTick = 100;
-            final int speedFactor = 700;
-            final int timeFactor = 2;
+            //final int countTick = 100;
+            final int speedFactor = 7;
+            //final int timeFactor = 2;
             float distanceY = velocityY /speedFactor;
-            long end = System.currentTimeMillis() +  (long)Math.abs(velocityY)/timeFactor;
-            long now = System.currentTimeMillis();
 
-            for(long i=0;i<end-now;i+=(end-now)/countTick){
+            if(null == m_threadFling) {
+                m_threadFling = new Thread(new FlingRunnable(distanceY));
+                m_threadFling.start();
+            } else if(!m_threadFling.isAlive()){
+                m_threadFling = new Thread(new FlingRunnable(distanceY));
+                m_threadFling.start();
+                } else{
+                return false;
+            }
 
-                 FlingRunnable fr = new FlingRunnable(distanceY);
-                 postDelayed(fr,  i);                    ;
-                 distanceY -= distanceY / countTick;
-                 now = System.currentTimeMillis();
-                }
 
             return true;
         }
@@ -167,13 +169,23 @@ public class MyCustomGrid extends View {
 
     private class FlingRunnable  implements Runnable{
         private  float m_localY = 0;
+        private final int tickCount = 100;
+        private final long timePeriodMS = 2000;//ms
+        private final long sleepTimeMS  = timePeriodMS/tickCount;
         FlingRunnable(float distanceY)
         {
             m_localY = distanceY;
         }
         public void run() {
-            m_distanceY -= m_localY;
-            postInvalidate();
+            for(int i=0;i<tickCount;i++) {
+                m_distanceY -= m_localY / (tickCount+i);
+                postInvalidate();
+                try {
+                    Thread.sleep(sleepTimeMS);
+                } catch (InterruptedException e) {
+                    ; // just ignore
+                }
+            }
         }
     }
 }
