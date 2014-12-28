@@ -59,7 +59,8 @@ public class InetHandler  {
         private String m_strCount = "1";
         public FetchImages(String strToken) {
             m_strToken = strToken;
-            m_strUrl = "https://api.instagram.com/v1/tags/umbrella/media/recent?access_token="+m_strToken +"&count="+m_strCount+"&max_tag_id="+ m_strMinTagID;
+            m_strMinTagID = FileHandler.getInstance().readLastTagNumber();
+            m_strUrl = "https://api.instagram.com/v1/tags/umbrella/media/recent?access_token="+m_strToken +"&count="+m_strCount+"&min_tag_id="+ m_strMinTagID;
 
         }
         private  String convertInputStreamToString(InputStream inputStream) throws IOException{
@@ -91,10 +92,10 @@ public class InetHandler  {
         private String getNextMinTagID(String JSONText) throws JSONException
         {
             String strTagPagination = "pagination";
-            String strTagMaxID = "min_tag_id";
+            String strTagMinID = "min_tag_id";
             JSONObject jObject = new JSONObject(JSONText);
 
-            return jObject.getJSONObject(strTagPagination).getString(strTagMaxID);
+            return jObject.getJSONObject(strTagPagination).getString(strTagMinID);
 
         }
 
@@ -149,6 +150,7 @@ public class InetHandler  {
                 try {
                     String JSONText = getJSON(m_strUrl);
                     m_strMinTagID = getNextMinTagID(JSONText);
+                    FileHandler.getInstance().writeLastTagNumber(m_strMinTagID);
                     m_strUrl = getNextURL(JSONText);
                     InstPicture instPicture = getPicture(JSONText);
                     FileHandler.getInstance().addPicture(instPicture);

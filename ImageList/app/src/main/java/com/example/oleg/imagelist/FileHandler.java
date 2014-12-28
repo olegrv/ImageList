@@ -15,6 +15,7 @@ public class FileHandler {
 
     private static FileHandler m_instance = null;
     private Context m_context = null;
+    private final String m_strLastTagFileName = "lastTag.txt";
 
     private FileHandler() {
 
@@ -70,6 +71,40 @@ public class FileHandler {
         }
 
 
+    }
+
+    public synchronized String readLastTagNumber() {
+        String str = "0";
+        try {
+            Context context = FileHandler.getInstance().getContext();
+
+
+            FileInputStream fisTag = context.openFileInput(m_strLastTagFileName);
+            DataInputStream disTag = new DataInputStream(fisTag);
+
+            str = disTag.readUTF();
+        }
+        catch (IOException e) {
+            ;
+        }
+        return str;
+    }
+
+    public synchronized void writeLastTagNumber(String strTagNumber) {
+        try {
+
+            FileOutputStream fosTag = m_context.openFileOutput(m_strLastTagFileName, Context.MODE_PRIVATE);
+            DataOutputStream dosTag = new DataOutputStream(fosTag);
+
+
+            dosTag.writeUTF(strTagNumber);
+
+            dosTag.close();
+            fosTag.close();
+        }
+        catch (IOException e) {
+             ;
+        }
     }
 
     private void loadLastPictureNumber()
