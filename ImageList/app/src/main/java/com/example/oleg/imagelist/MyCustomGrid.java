@@ -16,7 +16,7 @@ import android.view.View;
 public class MyCustomGrid extends View {
     private float m_distanceY = 0;
     private boolean m_vertical = true;
-    private GestureDetector gestureDetector = null;
+    private GestureDetector m_gestureDetector = null;
     private float m_lastPoint = -1;
     private final int HGAP = 3;
     private final int WGAP = 15;
@@ -26,7 +26,7 @@ public class MyCustomGrid extends View {
     public MyCustomGrid(Context context, AttributeSet attrs) {
         super(context, attrs);
         m_context = context;
-        gestureDetector = new GestureDetector(context, new MyGestureListener());
+        m_gestureDetector = new GestureDetector(context, new MyGestureListener());
     }
 
     private class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
@@ -36,7 +36,22 @@ public class MyCustomGrid extends View {
 
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            m_distanceY +=velocityY;
+
+            final int countTick = 100;
+            final int speedFactor = 700;
+            final int timeFactor = 2;
+            float distanceY = velocityY /speedFactor;
+            long end = System.currentTimeMillis() +  (long)Math.abs(velocityY)/timeFactor;
+            long now = System.currentTimeMillis();
+
+            for(long i=0;i<end-now;i+=(end-now)/countTick){
+
+                 FlingRunnable fr = new FlingRunnable(distanceY);
+                 postDelayed(fr,  i);                    ;
+                 distanceY -= distanceY / countTick;
+                 now = System.currentTimeMillis();
+                }
+
             return true;
         }
 
@@ -46,6 +61,9 @@ public class MyCustomGrid extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event)
     {
+
+        if(m_gestureDetector.onTouchEvent(event))
+            return true;
 
          int action = event.getActionMasked();
         float currentY = event.getY();
@@ -144,6 +162,18 @@ public class MyCustomGrid extends View {
             else
                 wcount++;
 
+        }
+    }
+
+    private class FlingRunnable  implements Runnable{
+        private  float m_localY = 0;
+        FlingRunnable(float distanceY)
+        {
+            m_localY = distanceY;
+        }
+        public void run() {
+            m_distanceY -= m_localY;
+            postInvalidate();
         }
     }
 }
