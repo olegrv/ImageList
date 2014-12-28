@@ -119,7 +119,7 @@ public class MyCustomGrid extends View {
                 currentHeight+=instPicture.getHeight()*(width_image/instPicture.getWidth());
                 currentWidth += width_image + WGAP;
             }
-            else  if(currentHeight >=  m_distanceY-heightCanvas && currentHeight < m_distanceY+heightCanvas*2) {
+            else  if(currentHeight >=  m_distanceY-heightCanvas && currentHeight < m_distanceY+heightCanvas*3) {
 
                 if(!instPicture.isDataLoaded())
                     instPicture.loadData();
