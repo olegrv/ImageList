@@ -18,8 +18,6 @@ public class MyCustomGrid extends View {
     private boolean m_vertical = true;
     private GestureDetector m_gestureDetector = null;
     private float m_lastPoint = -1;
-    private final int HGAP = 3;
-    private final int WGAP = 15;
     private Context m_context=null;
     private Thread m_threadFling = null;
 
@@ -112,12 +110,12 @@ public class MyCustomGrid extends View {
     protected void onDraw(Canvas canvas) {
 
         int wcount = 0;
-        int wsize = (m_vertical)?3:5;
+        int wsize = (m_vertical)?Constants.PORTRET_COUNT:Constants.LANSCAPE_COUNT;
 
         Paint paint=new Paint();
         int widthCanvas = canvas.getWidth();
         int heightCanvas = canvas.getHeight();
-        float width_image = widthCanvas/wsize-WGAP;
+        float width_image = widthCanvas/wsize-Constants.WGAP;
 
         float []Heights = {0,0,0,0,0};
 
@@ -125,7 +123,7 @@ public class MyCustomGrid extends View {
         ((Activity)getContext()).getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
         int countImages = FileHandler.getInstance().getCount();
-        float currentWidth = WGAP;
+        float currentWidth = Constants.WGAP;
         for(int i=0;i<countImages;i++)
         {
 
@@ -137,7 +135,7 @@ public class MyCustomGrid extends View {
             if(currentHeight <  m_distanceY-heightCanvas)
             {
                 currentHeight+=instPicture.getHeight()*(width_image/instPicture.getWidth());
-                currentWidth += width_image + WGAP;
+                currentWidth += width_image + Constants.WGAP;
             }
             else  if(currentHeight >=  m_distanceY-heightCanvas && currentHeight < m_distanceY+heightCanvas*3) {
 
@@ -146,8 +144,8 @@ public class MyCustomGrid extends View {
 
                 instPicture.draw(canvas,new RectF(currentWidth,currentHeight-m_distanceY,currentWidth+width_image,currentHeight-m_distanceY+instPicture.getHeight()*(width_image/instPicture.getWidth())),metrics);
                 instPicture.freeLock();
-                currentHeight+=instPicture.getHeight()+HGAP;
-                currentWidth += width_image + WGAP;
+                currentHeight+=instPicture.getHeight()+Constants.HGAP;
+                currentWidth += width_image + Constants.WGAP;
             }
             else {
                 if(wcount==(wsize-1)) {
@@ -155,11 +153,11 @@ public class MyCustomGrid extends View {
                 }
             }
 
-            Heights[wcount] = currentHeight+50;
+            Heights[wcount] = currentHeight+Constants.HGAP_IMAGES;
             if(wcount==(wsize-1))
             {
                 wcount = 0;
-                currentWidth = WGAP;
+                currentWidth = Constants.WGAP;
             }
             else
                 wcount++;
@@ -169,16 +167,15 @@ public class MyCustomGrid extends View {
 
     private class FlingRunnable  implements Runnable{
         private  float m_localY = 0;
-        private final int tickCount = 100;
-        private final long timePeriodMS = 2000;//ms
-        private final long sleepTimeMS  = timePeriodMS/tickCount;
+
+        private final long sleepTimeMS  = Constants.TIME_PERIOD_FLYING_MS/Constants.TICK_FLING_COUNT;
         FlingRunnable(float distanceY)
         {
             m_localY = distanceY;
         }
         public void run() {
-            for(int i=0;i<tickCount;i++) {
-                m_distanceY -= m_localY / (tickCount+i);
+            for(int i=0;i<Constants.TICK_FLING_COUNT;i++) {
+                m_distanceY -= m_localY / (Constants.TICK_FLING_COUNT+i);
                 postInvalidate();
                 try {
                     Thread.sleep(sleepTimeMS);

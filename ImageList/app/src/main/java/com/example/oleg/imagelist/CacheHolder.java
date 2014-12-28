@@ -8,7 +8,7 @@ public class CacheHolder {
     private static CacheHolder m_instance = null;
     private ArrayList<InstPicture> m_listCache = null;
     private int m_lastID = 0;
-    private final int SIZE_CACHE = 128*2;
+    private final int SIZE_CACHE = Constants.SIZE_CACHE;
     private Thread m_threadCacheUpdate = null;
 
     private CacheHolder() {

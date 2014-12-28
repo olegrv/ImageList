@@ -20,7 +20,7 @@ import java.util.ArrayList;
 public class InetHandler  {
 
     private static InetHandler m_instance = null;
-    private final float scaleFactor = 0.7f;
+    private final float scaleFactor = Constants.SCALE_IMAGE_FACTOR;
 
     private InetHandler(){};
 
@@ -54,13 +54,12 @@ public class InetHandler  {
     private class FetchImages implements Runnable {
         private String m_strToken = null;
         private String m_strUrl = null;
-        private String m_strHashTag = "umbrella";
         private String m_strMinTagID = "0";
         private String m_strCount = "1";
         public FetchImages(String strToken) {
             m_strToken = strToken;
             m_strMinTagID = FileHandler.getInstance().readLastTagNumber();
-            m_strUrl = "https://api.instagram.com/v1/tags/umbrella/media/recent?access_token="+m_strToken +"&count="+m_strCount+"&min_tag_id="+ m_strMinTagID;
+            m_strUrl = "https://api.instagram.com/v1/tags/"+Constants.HASH_TAG+"/media/recent?access_token="+m_strToken +"&count="+m_strCount+"&min_tag_id="+ m_strMinTagID;
 
         }
         private  String convertInputStreamToString(InputStream inputStream) throws IOException{
@@ -146,7 +145,7 @@ public class InetHandler  {
 
         public void run() {
 
-            while(true) {
+            while(FileHandler.getInstance().getCount()<Constants.MAX_FILES_ALLOWED_TO_LOAD) {
                 try {
                     String JSONText = getJSON(m_strUrl);
                     m_strMinTagID = getNextMinTagID(JSONText);
@@ -179,7 +178,7 @@ public class InetHandler  {
         }
 
         public void run() {
-            long timeoutForSleepMilliseconds = 5000l;
+            long timeoutForSleepMilliseconds = Constants.PERIOD_TO_TRAY_INET;
             while(true) {
                 if(IsInetConnected() == true)
                     break;

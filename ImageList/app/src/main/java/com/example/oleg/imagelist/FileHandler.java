@@ -15,7 +15,7 @@ public class FileHandler {
 
     private static FileHandler m_instance = null;
     private Context m_context = null;
-    private final String m_strLastTagFileName = "lastTag.txt";
+
 
     private FileHandler() {
 
@@ -23,11 +23,8 @@ public class FileHandler {
 
     private final int NOT_INIT_PICNUMPER = -1;
     private int m_nLastPictureNumber = NOT_INIT_PICNUMPER;
-    private final String m_strCountFileName = "count.bin";
-    private final String m_strExtJpeg = ".jpeg";
-    private final String m_strExtHeight = ".bin";
-    private final String m_strExtTags = ".txt";
-    private final String SPLIT_SYMBOL = ";";
+
+
 
     public static synchronized FileHandler getInstance() {
         if (null == m_instance) {
@@ -60,7 +57,7 @@ public class FileHandler {
         try {
 
 
-            FileOutputStream fos = m_context.openFileOutput(m_strCountFileName, Context.MODE_PRIVATE);
+            FileOutputStream fos = m_context.openFileOutput(Constants.COUNT_FILE_NAME, Context.MODE_PRIVATE);
 
             DataOutputStream dos = new DataOutputStream(fos);
             dos.writeInt(m_nLastPictureNumber);
@@ -79,7 +76,7 @@ public class FileHandler {
             Context context = FileHandler.getInstance().getContext();
 
 
-            FileInputStream fisTag = context.openFileInput(m_strLastTagFileName);
+            FileInputStream fisTag = context.openFileInput(Constants.LAST_TAG_FILE_NAME);
             DataInputStream disTag = new DataInputStream(fisTag);
 
             str = disTag.readUTF();
@@ -93,7 +90,7 @@ public class FileHandler {
     public synchronized void writeLastTagNumber(String strTagNumber) {
         try {
 
-            FileOutputStream fosTag = m_context.openFileOutput(m_strLastTagFileName, Context.MODE_PRIVATE);
+            FileOutputStream fosTag = m_context.openFileOutput(Constants.LAST_TAG_FILE_NAME, Context.MODE_PRIVATE);
             DataOutputStream dosTag = new DataOutputStream(fosTag);
 
 
@@ -113,7 +110,7 @@ public class FileHandler {
 
         try {
 
-            FileInputStream fis = m_context.openFileInput(m_strCountFileName);
+            FileInputStream fis = m_context.openFileInput(Constants.COUNT_FILE_NAME);
             DataInputStream dis = new DataInputStream(fis);
 
             m_nLastPictureNumber = dis.readInt();
@@ -135,18 +132,18 @@ public class FileHandler {
         checkPictureNumber();
         try {
 
-            String strJpegFileName = m_nLastPictureNumber  + m_strExtJpeg;
-            String strTagsFileName = m_nLastPictureNumber + m_strExtTags;
-            String strHeightName = m_nLastPictureNumber + m_strExtHeight;
+            String strJpegFileName = m_nLastPictureNumber  + Constants.EXT_JPEG;
+            String strTagsFileName = m_nLastPictureNumber + Constants.EXT_TAGS;
+            String strSizesFileName = m_nLastPictureNumber + Constants.EXT_SIZES;
 
             FileOutputStream fosJpeg = m_context.openFileOutput(strJpegFileName, Context.MODE_PRIVATE);
             FileOutputStream fosTags = m_context.openFileOutput(strTagsFileName, Context.MODE_PRIVATE);
-            FileOutputStream fosHeight = m_context.openFileOutput(strHeightName, Context.MODE_PRIVATE);
+            FileOutputStream fosSizes = m_context.openFileOutput(strSizesFileName, Context.MODE_PRIVATE);
 
 
             DataOutputStream dosJpeg = new DataOutputStream(fosJpeg);
             DataOutputStream dosTags = new DataOutputStream(fosTags);
-            DataOutputStream dosHeight = new DataOutputStream(fosHeight);
+            DataOutputStream dosSizes = new DataOutputStream(fosSizes);
 
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             instPicture.getBitmap().compress(Bitmap.CompressFormat.JPEG, 75, stream);
@@ -156,21 +153,24 @@ public class FileHandler {
             String strAllTags = "";
 
             for (int i = 0; i < instPicture.getTags().size(); i++)
-                strAllTags += instPicture.getTags().get(i) + ((instPicture.getTags().size() == i) ? "" : SPLIT_SYMBOL);
+                strAllTags += instPicture.getTags().get(i) + ((instPicture.getTags().size() == i) ? "" : Constants.SPLIT_TAGS_SYMBOL);
 
             dosTags.writeUTF(strAllTags);
 
-            dosHeight.writeInt(instPicture.getHeight());
-            dosHeight.writeInt(instPicture.getWidth());
+            dosSizes.writeInt(instPicture.getHeight());
+            dosSizes.writeInt(instPicture.getWidth());
 
             dosJpeg.close();
             dosTags.close();
+            dosSizes.close();;
+
             fosJpeg.close();
             fosTags.close();
+            fosSizes.close();
 
             increaseLastPictureNumber();
         } catch (IOException e) {
-            m_nLastPictureNumber = 0;
+
         }
 
     }
@@ -180,11 +180,11 @@ public class FileHandler {
         InstPicture instPicture = null;
         try {
 
-            String strJpegFileName = index + m_strExtJpeg;
-            String strTagsFileName = index + m_strExtTags;
-            String strHeightFileName = index + m_strExtHeight;
+            String strJpegFileName = index  + Constants.EXT_JPEG;
+            String strTagsFileName = index + Constants.EXT_TAGS;
+            String strSizesFileName = index + Constants.EXT_SIZES;
 
-            FileInputStream fis = m_context.openFileInput(strHeightFileName);
+            FileInputStream fis = m_context.openFileInput(strSizesFileName);
             DataInputStream dis = new DataInputStream(fis);
 
             int height = dis.readInt();

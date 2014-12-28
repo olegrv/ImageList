@@ -15,8 +15,8 @@ public class AuthenticationActivity extends ActionBarActivity {
 
     private Button buttonCancel = null;
     private WebView webviewAuth = null;
-    private String strAuthURL = "https://instagram.com/oauth/authorize/?client_id=bd3d78d339ee4096a6a8a831f40c5315&redirect_uri=http://localhost&response_type=token";
-    private String strRespURL = "http://localhost";
+    private final String strAuthURL = Constants.AUTH_URL;
+    private final  String strRespURL = Constants.AUTH_RET_URL;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

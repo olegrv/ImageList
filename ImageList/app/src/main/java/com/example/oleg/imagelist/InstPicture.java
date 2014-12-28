@@ -16,8 +16,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class InstPicture {
-    private static final java.lang.String SPLIT_SYMBOL =";" ;
-    private static final int HGAP = 3;
+
+
     private  int m_width = 0;
     private  Bitmap m_bitmap = null;
     private  ArrayList<String> m_tags = null;
@@ -54,14 +54,14 @@ public class InstPicture {
         Paint paint = new Paint();
 
         int currentHeight = getBitmap().getHeight();
-        currentHeight+=HGAP;
+        currentHeight+=Constants.HGAP;
         for(int j=getTags().size()-1;j!=0;j--)
 
         {
             Rect bounds = new Rect();
 
             paint.getTextBounds(getTags().get(j), 0, getTags().get(j).length(), bounds);
-            currentHeight+=bounds.height()+HGAP;
+            currentHeight+=bounds.height()+Constants.HGAP;
 
         }
         m_height = currentHeight;
@@ -105,7 +105,7 @@ public class InstPicture {
 
             ArrayList<String> tags = new ArrayList<String>();
 
-            String[] strs = str.split(SPLIT_SYMBOL);
+            String[] strs = str.split(Constants.SPLIT_TAGS_SYMBOL);
 
             for (int i = 0; i < strs.length; i++)
                 tags.add(strs[i]);
@@ -127,13 +127,13 @@ public class InstPicture {
         Canvas newCanvas = new Canvas(bitmap);
         Paint paint = new Paint();
         newCanvas.drawBitmap(getBitmap(), 0, 0, paint);
-        currentHeight += y_size + HGAP;
+        currentHeight += y_size + Constants.HGAP;
         for (int j = getTags().size() - 1; j != 0; j--)
 
         {
             Rect bounds = new Rect();
             paint.getTextBounds(getTags().get(j), 0, getTags().get(j).length(), bounds);
-            currentHeight += bounds.height() + HGAP;
+            currentHeight += bounds.height() + Constants.HGAP;
             newCanvas.drawText(getTags().get(j), 0, currentHeight, paint);
 
         }
