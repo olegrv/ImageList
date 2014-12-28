@@ -24,6 +24,7 @@ public class InstPicture {
     private int m_height = 0;
     private String m_strJpegFileName = null;
     private String m_strTagsFileName = null;
+    private boolean m_locked = false;
 
     public InstPicture( Bitmap bitmap, ArrayList<String> tags)
     {
@@ -147,5 +148,23 @@ public class InstPicture {
     public int getWidth() {
 
         return m_width;
+    }
+
+    public synchronized void setLock()
+    {
+        m_locked = true;
+    }
+    public synchronized boolean  isLock()
+    {
+        return m_locked;
+    }
+    public synchronized void freeLock()
+    {
+        m_locked = false;
+    }
+
+    public void freeData() {
+        m_bitmap = null;
+        m_tags = null;
     }
 }

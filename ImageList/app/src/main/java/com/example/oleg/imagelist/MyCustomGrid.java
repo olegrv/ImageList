@@ -111,7 +111,7 @@ public class MyCustomGrid extends View {
 
             float currentHeight = Heights[wcount];
 
-            InstPicture instPicture = FileHandler.getInstance().getPictureByID(i);
+            InstPicture instPicture = CacheHolder.getInstance().getPictureByID(i);
             if(null == instPicture)
                 continue;
             if(currentHeight <  m_distanceY-heightCanvas)
@@ -125,6 +125,7 @@ public class MyCustomGrid extends View {
                     instPicture.loadData();
 
                 instPicture.draw(canvas,new RectF(currentWidth,currentHeight-m_distanceY,currentWidth+width_image,currentHeight-m_distanceY+instPicture.getHeight()*(width_image/instPicture.getWidth())),metrics);
+                instPicture.freeLock();
                 currentHeight+=instPicture.getHeight()+HGAP;
                 currentWidth += width_image + WGAP;
             }
