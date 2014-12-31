@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -112,7 +111,7 @@ public class MyCustomGrid extends View {
         int wcount = 0;
         int wsize = (m_vertical)?Constants.PORTRET_COUNT:Constants.LANSCAPE_COUNT;
 
-        Paint paint=new Paint();
+
         int widthCanvas = canvas.getWidth();
         int heightCanvas = canvas.getHeight();
         float width_image = widthCanvas/wsize-Constants.WGAP;
@@ -141,7 +140,7 @@ public class MyCustomGrid extends View {
 
                 if(!instPicture.isDataLoaded())
                     instPicture.loadData();
-
+                CacheHolder.getInstance().setLastID(i);
                 instPicture.draw(canvas,new RectF(currentWidth,currentHeight-m_distanceY,currentWidth+width_image,currentHeight-m_distanceY+instPicture.getHeight()*(width_image/instPicture.getWidth())),metrics);
                 instPicture.freeLock();
                 currentHeight+=instPicture.getHeight()+Constants.HGAP;

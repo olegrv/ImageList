@@ -55,7 +55,7 @@ public class InstPicture {
 
         int currentHeight = getBitmap().getHeight();
         currentHeight+=Constants.HGAP;
-        for(int j=getTags().size()-1;j!=0;j--)
+        for(int j=0;j<getTags().size();j++)
 
         {
             Rect bounds = new Rect();

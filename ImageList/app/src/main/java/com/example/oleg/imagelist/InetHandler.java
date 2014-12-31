@@ -54,12 +54,11 @@ public class InetHandler  {
     private class FetchImages implements Runnable {
         private String m_strToken = null;
         private String m_strUrl = null;
-        private String m_strMinTagID = "0";
         private String m_strCount = "1";
         public FetchImages(String strToken) {
             m_strToken = strToken;
-            m_strMinTagID = FileHandler.getInstance().readLastTagNumber();
-            m_strUrl = "https://api.instagram.com/v1/tags/"+Constants.HASH_TAG+"/media/recent?access_token="+m_strToken +"&count="+m_strCount+"&min_tag_id="+ m_strMinTagID;
+            m_strUrl = "https://api.instagram.com/v1/tags/"+Constants.HASH_TAG+"/media/recent?access_token="+m_strToken +"&count="+m_strCount+"&max_tag_id=0";
+
 
         }
         private  String convertInputStreamToString(InputStream inputStream) throws IOException{
@@ -88,13 +87,13 @@ public class InetHandler  {
             return strJSONText;
         }
 
-        private String getNextMinTagID(String JSONText) throws JSONException
+        private String getNextMaxTagID(String JSONText) throws JSONException
         {
             String strTagPagination = "pagination";
-            String strTagMinID = "min_tag_id";
+            String strTagMaxID = "next_max_tag_id";
             JSONObject jObject = new JSONObject(JSONText);
 
-            return jObject.getJSONObject(strTagPagination).getString(strTagMinID);
+            return jObject.getJSONObject(strTagPagination).getString(strTagMaxID);
 
         }
 
@@ -115,19 +114,26 @@ public class InetHandler  {
             String strTagResImage = "low_resolution";
             String strTagImageURL = "url";
             String strTagHashTags = "tags";
+            String strTypeTag = "type";
+            String strTypeResp = "image";
 
             JSONObject jObject = new JSONObject(JSONText);
             JSONArray jObjectData = jObject.getJSONArray(strTagData);
             assert(jObjectData.length()==1); // we get images one by one
+            String strType = jObjectData.getJSONObject(0).getString(strTypeTag);
+            if(strType.compareTo(strTypeResp)!=0)
+                return null;
             String strImageUrl = jObjectData.getJSONObject(0).getJSONObject(strTagImage).getJSONObject(strTagResImage).getString(strTagImageURL);
 
             ArrayList<String> tags = new ArrayList<String>();
-
-            JSONArray jObjectTags = jObjectData.getJSONObject(0).getJSONArray(strTagHashTags);
-            for(int i=jObjectTags.length()-1;i!=0;i--)
-            {
-                tags.add(jObjectTags.getString(i));
+            try {
+                JSONArray jObjectTags = jObjectData.getJSONObject(0).getJSONArray(strTagHashTags);
+                for (int i = 0; i < jObjectTags.length(); i++) {
+                    tags.add(jObjectTags.getString(i));
+                }
             }
+            catch (Exception e)
+            {;}
 
             InputStream inputStream = null;
             android.graphics.Bitmap  bitmap = null;
@@ -144,22 +150,43 @@ public class InetHandler  {
         }
 
         public void run() {
+            String previousMaxTagID = FileHandler.getInstance().readLastTagNumber();
+            String newMaxTagID = previousMaxTagID;
+            String currentMaxTagID = null;
+            String JSONText = null;
+            InstPicture instPicture = null;
 
-            while(FileHandler.getInstance().getCount()<Constants.MAX_FILES_ALLOWED_TO_LOAD) {
-                try {
-                    String JSONText = getJSON(m_strUrl);
-                    m_strMinTagID = getNextMinTagID(JSONText);
-                    FileHandler.getInstance().writeLastTagNumber(m_strMinTagID);
-                    m_strUrl = getNextURL(JSONText);
-                    InstPicture instPicture = getPicture(JSONText);
-                    FileHandler.getInstance().addPicture(instPicture);
 
-                }
-                catch (Exception e)
-                {
-                    ; //just try again;
-                }
+            try {
+                JSONText = getJSON(m_strUrl);
+                newMaxTagID = getNextMaxTagID(JSONText);
+                currentMaxTagID = getNextMaxTagID(JSONText);
             }
+            catch (Exception e)
+            {
+                newMaxTagID = "!";
+                currentMaxTagID = "A";
+            }
+
+            while(FileHandler.getInstance().getLastCount()<Constants.MAX_FILES_ALLOWED_TO_LOAD_ONE_TIME) {
+
+                try {
+
+                     if(currentMaxTagID.compareTo(previousMaxTagID)<=0)
+                          break;
+                     instPicture = getPicture(JSONText);
+                     if(null!=instPicture)
+                     FileHandler.getInstance().addPicture(instPicture);
+                     if(null != JSONText)
+                           m_strUrl = getNextURL(JSONText);
+                     JSONText = getJSON(m_strUrl);
+                     currentMaxTagID = getNextMaxTagID(JSONText);
+                }
+               catch (Exception e)
+               {;}
+            }
+
+            FileHandler.getInstance().writeLastTagNumber(newMaxTagID);
 
         }
 

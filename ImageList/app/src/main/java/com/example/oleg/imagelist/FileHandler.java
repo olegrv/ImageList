@@ -10,6 +10,7 @@ import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class FileHandler {
 
@@ -23,7 +24,8 @@ public class FileHandler {
 
     private final int NOT_INIT_PICNUMPER = -1;
     private int m_nLastPictureNumber = NOT_INIT_PICNUMPER;
-
+    private int m_nLastPictureNumberNew = 0;
+    private ArrayList<Integer> m_index = null;
 
 
     public static synchronized FileHandler getInstance() {
@@ -32,6 +34,8 @@ public class FileHandler {
         }
         return m_instance;
     }
+
+
 
     public synchronized void setContext(Context context) {
         m_context = context;
@@ -42,16 +46,73 @@ public class FileHandler {
         return  m_context;
     }
 
+    private void loadIndex()
+    {
+        m_index = new ArrayList<Integer>();
+        try {
+
+            FileInputStream fis = m_context.openFileInput(Constants.INDEX_FILE_NAME);
+            DataInputStream dis = new DataInputStream(fis);
+            int count = dis.readInt();
+            while(count>0) {
+                m_index.add(dis.readInt());
+                count--;
+            }
+
+            dis.close();
+            fis.close();
+        } catch (IOException e) {
+            ;
+        }
+
+    }
+
+    private void saveIndex()
+    {
+
+        try {
+
+
+            FileOutputStream fos = m_context.openFileOutput(Constants.INDEX_FILE_NAME, Context.MODE_PRIVATE);
+
+            DataOutputStream dos = new DataOutputStream(fos);
+            dos.writeInt(m_index.size());
+            for(int i=0;i < m_index.size();i++)
+                dos.writeInt(m_index.get(i));
+
+            dos.close();
+            fos.close();
+        } catch (IOException e) {
+            ;
+        }
+
+    }
+
     private void checkPictureNumber() {
-        if (NOT_INIT_PICNUMPER == m_nLastPictureNumber)
+        if (NOT_INIT_PICNUMPER == m_nLastPictureNumber) {
             loadLastPictureNumber();
+            loadIndex();
+        }
+
 
     }
 
     private void increaseLastPictureNumber() {
+
+        m_nLastPictureNumberNew++;
         m_nLastPictureNumber++;
         writeLastPictureNumber();
+
     }
+
+    private void updateIndex() {
+
+        m_index.add(m_nLastPictureNumberNew,m_nLastPictureNumber);
+        saveIndex();
+    }
+
+
+
 
     private void writeLastPictureNumber() {
         try {
@@ -71,7 +132,7 @@ public class FileHandler {
     }
 
     public synchronized String readLastTagNumber() {
-        String str = "0";
+        String str = "!";
         try {
             Context context = FileHandler.getInstance().getContext();
 
@@ -168,7 +229,15 @@ public class FileHandler {
             fosTags.close();
             fosSizes.close();
 
+
+            updateIndex();
+            CacheHolder.getInstance().reloadPictureById(m_nLastPictureNumberNew);
             increaseLastPictureNumber();
+
+
+
+
+
         } catch (IOException e) {
 
         }
@@ -178,11 +247,12 @@ public class FileHandler {
     public synchronized InstPicture getPictureByID(int index) {
         checkPictureNumber();
         InstPicture instPicture = null;
+        int newIndex = m_index.get(index);
         try {
 
-            String strJpegFileName = index  + Constants.EXT_JPEG;
-            String strTagsFileName = index + Constants.EXT_TAGS;
-            String strSizesFileName = index + Constants.EXT_SIZES;
+            String strJpegFileName = newIndex  + Constants.EXT_JPEG;
+            String strTagsFileName = newIndex + Constants.EXT_TAGS;
+            String strSizesFileName = newIndex + Constants.EXT_SIZES;
 
             FileInputStream fis = m_context.openFileInput(strSizesFileName);
             DataInputStream dis = new DataInputStream(fis);
@@ -202,5 +272,8 @@ public class FileHandler {
     }
 
 
+    public synchronized int getLastCount() {
 
+        return m_nLastPictureNumberNew;
+    }
 }

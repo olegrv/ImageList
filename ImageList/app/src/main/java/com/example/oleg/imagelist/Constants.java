@@ -4,7 +4,7 @@ package com.example.oleg.imagelist;
  * Created by oleg on 12/28/14.
  */
 public  class Constants {
-    public final static int MAX_FILES_ALLOWED_TO_LOAD = 0x10000;
+    public final static int MAX_FILES_ALLOWED_TO_LOAD_ONE_TIME = 64;
     public final static float SCALE_IMAGE_FACTOR = 0.7f;
     public final static String HASH_TAG = "umbrella";
     public static final long PERIOD_TO_TRAY_INET = 5000l;
@@ -13,6 +13,7 @@ public  class Constants {
     public static final String SPLIT_TAGS_SYMBOL =";";
     public static final String LAST_TAG_FILE_NAME = "lastTag.txt";
     public static final String COUNT_FILE_NAME = "count.bin";
+    public static final String INDEX_FILE_NAME = "index.bin";
     public static final String EXT_JPEG = ".jpeg";
     public static final String EXT_SIZES = ".bin";
     public static final String EXT_TAGS = ".txt";

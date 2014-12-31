@@ -46,22 +46,39 @@ public class CacheHolder {
             res = m_listCache.get(id);
         }
 
-        if(m_lastID != id)
-            StartCacheUpdate();
-         m_lastID = id;
 
         res.setLock();
         return res;
     }
 
-    private synchronized void loadNextPicture()
+    public void setLastID(int id)
     {
+
+        if(m_lastID != id)
+        {
+            m_lastID = id;
+            StartCacheUpdate();
+        }
+
+
+    }
+
+    private synchronized boolean loadNextPicture()
+    {
+        if(m_listCache.size()<FileHandler.getInstance().getCount()) {
             m_listCache.add(FileHandler.getInstance().getPictureByID(m_listCache.size()));
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+
     }
 
     private synchronized void loadDataPictureByID(int id)
     {
-        if(id<m_listCache.size()-1)
+        if(id<m_listCache.size())
             if(!m_listCache.get(id).isDataLoaded())
                 m_listCache.get(id).loadData();
     }
@@ -70,12 +87,19 @@ public class CacheHolder {
     {
         return m_listCache.size();
     }
-    private synchronized void freeDataPictureByID(int id)
+    public synchronized  void reloadPictureById (int id)
     {
-        if(id<m_listCache.size()-1)
-            if(m_listCache.get(id).isDataLoaded() && !m_listCache.get(id).isLock())
+        if(id<m_listCache.size()) {
+            m_listCache.add(id,FileHandler.getInstance().getPictureByID(id));
+        }
+    }
+    private   void freeDataPictureByID(int id)
+    {
+        if(id<m_listCache.size())
+            if(m_listCache.get(id).isDataLoaded() && (!m_listCache.get(id).isLock()))
                 m_listCache.get(id).freeData();
     }
+
 
     private class CacheUpdate implements Runnable {
 
@@ -86,7 +110,8 @@ public class CacheHolder {
             int lastID = m_lastID;
             for(int i=countCache;i<countFile;i++)
             {
-                loadNextPicture();
+                if(!loadNextPicture())
+                    break;
             }
             int newCountCache = getPictureCount();
 
