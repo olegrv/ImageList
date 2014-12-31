@@ -105,6 +105,16 @@ public class MyCustomGrid extends View {
         }
     }
 
+
+    private int getCurrentRow(float []Heights)
+    {
+        int minHRow = 0;
+        for(int i = 0; i<Heights.length;i++)
+            if(Heights[i]<Heights[minHRow])
+                minHRow = i;
+
+    return minHRow;
+}
     @Override
     protected void onDraw(Canvas canvas) {
 
@@ -116,17 +126,23 @@ public class MyCustomGrid extends View {
         int heightCanvas = canvas.getHeight();
         float width_image = widthCanvas/wsize-Constants.WGAP;
 
-        float []Heights = {0,0,0,0,0};
+        float []Heights = new float[wsize];
+        for(int i = 0; i<Heights.length;i++)
+            Heights[i]=0;
+
 
         DisplayMetrics metrics = new DisplayMetrics();
         ((Activity)getContext()).getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
         int countImages = FileHandler.getInstance().getCount();
-        float currentWidth = Constants.WGAP;
+
+
         for(int i=0;i<countImages;i++)
         {
 
+            wcount = getCurrentRow(Heights);
             float currentHeight = Heights[wcount];
+
 
             InstPicture instPicture = CacheHolder.getInstance().getPictureByID(i);
             if(null == instPicture)
@@ -134,32 +150,33 @@ public class MyCustomGrid extends View {
             if(currentHeight <  m_distanceY-heightCanvas)
             {
                 currentHeight+=instPicture.getHeight()*(width_image/instPicture.getWidth());
-                currentWidth += width_image + Constants.WGAP;
+
             }
             else  if(currentHeight >=  m_distanceY-heightCanvas && currentHeight < m_distanceY+heightCanvas*3) {
 
                 if(!instPicture.isDataLoaded())
                     instPicture.loadData();
                 CacheHolder.getInstance().setLastID(i);
-                instPicture.draw(canvas,new RectF(currentWidth,currentHeight-m_distanceY,currentWidth+width_image,currentHeight-m_distanceY+instPicture.getHeight()*(width_image/instPicture.getWidth())),metrics);
+                RectF rect = new RectF(Constants.WGAP+wcount*width_image,currentHeight-m_distanceY,(wcount+1)*width_image,currentHeight-m_distanceY+instPicture.getHeight()*(width_image/instPicture.getWidth()));
+                instPicture.draw(canvas,rect,metrics);
                 instPicture.freeLock();
-                currentHeight+=instPicture.getHeight()+Constants.HGAP;
-                currentWidth += width_image + Constants.WGAP;
+                currentHeight+=rect.height();
+
             }
             else {
-                if(wcount==(wsize-1)) {
-                    break; // all row was showed
+                 int x = 0;
+                    break;
                 }
-            }
+
 
             Heights[wcount] = currentHeight+Constants.HGAP_IMAGES;
-            if(wcount==(wsize-1))
+           /* if(wcount==(wsize-1))
             {
                 wcount = 0;
                 currentWidth = Constants.WGAP;
             }
             else
-                wcount++;
+                wcount++;*/
 
         }
     }
