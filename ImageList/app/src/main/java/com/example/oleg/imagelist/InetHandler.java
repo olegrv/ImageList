@@ -34,30 +34,29 @@ public class InetHandler  {
     }
     private Thread m_threadCheckInet = null;
     private Thread m_threadFetchImages = null;
-    public void Start(ImagesActivity activity) {
+    public void Start() {
         if (null == m_threadCheckInet) // we should start thread only once
         {
-            m_threadCheckInet = new Thread(new CheckInetAndGetToken(activity));
+            m_threadCheckInet = new Thread(new CheckInet());
             m_threadCheckInet.start();
         }
     }
 
-    public void startFetchImages(String strToken) {
+    public void startFetchImages() {
 
         if (null == m_threadFetchImages) // we should start thread only once
         {
-            m_threadFetchImages = new Thread(new FetchImages(strToken));
+            m_threadFetchImages = new Thread(new FetchImages());
             m_threadFetchImages.start();
         }
     }
 
     private class FetchImages implements Runnable {
-        private String m_strToken = null;
         private String m_strUrl = null;
         private String m_strCount = "1";
-        public FetchImages(String strToken) {
-            m_strToken = strToken;
-            m_strUrl = "https://api.instagram.com/v1/tags/"+Constants.HASH_TAG+"/media/recent?access_token="+m_strToken +"&count="+m_strCount+"&max_tag_id=0";
+        public FetchImages() {
+
+            m_strUrl = "https://api.instagram.com/v1/tags/"+Constants.HASH_TAG+"/media/recent?client_id=bd3d78d339ee4096a6a8a831f40c5315"+"&count="+m_strCount+"&max_tag_id=0";
 
 
         }
@@ -195,13 +194,9 @@ public class InetHandler  {
 
 
 
-    private class CheckInetAndGetToken implements Runnable {
+    private class CheckInet implements Runnable {
 
-
-    private ImagesActivity m_activity;
-        public CheckInetAndGetToken(ImagesActivity activity) {
-            m_activity = activity;
-
+        public CheckInet() {
         }
 
         public void run() {
@@ -216,17 +211,10 @@ public class InetHandler  {
                     ;
                 }
             }
-             AskUserAuth();
+            startFetchImages();
 
         }
-        private void  AskUserAuth()
-        {
-            m_activity.runOnUiThread(new Runnable() {
-                public void run() {
-                    m_activity.showAuthActivity();
-                }
-            });
-        }
+
 
         private boolean IsInetConnected()
         {

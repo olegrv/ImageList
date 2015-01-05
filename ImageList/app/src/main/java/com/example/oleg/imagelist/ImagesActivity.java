@@ -1,6 +1,5 @@
 package com.example.oleg.imagelist;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -42,19 +41,10 @@ public class ImagesActivity extends ActionBarActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        InetHandler.getInstance().Start(this);
+        InetHandler.getInstance().Start();
         FileHandler.getInstance().setContext(this);
 
     }
-
-    public void showAuthActivity() {
-
-
-        Intent intent = new Intent(this, AuthenticationActivity.class);
-        this.startActivity(intent);
-    }
-
-
 
 
 }
