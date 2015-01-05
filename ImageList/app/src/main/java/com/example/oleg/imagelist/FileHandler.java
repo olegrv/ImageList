@@ -234,12 +234,15 @@ public class FileHandler {
             CacheHolder.getInstance().reloadPictureById(m_nLastPictureNumberNew);
             increaseLastPictureNumber();
 
+            ImagesActivity activity =  ((ImagesActivity)m_context);
+            if(null!=activity)
+                activity.invalidate();
 
 
 
-
-        } catch (IOException e) {
-
+        } catch (IOException e)
+        {
+            
         }
 
     }

@@ -8,10 +8,14 @@ import android.view.MenuItem;
 
 public class ImagesActivity extends ActionBarActivity {
 
+    private MyCustomGrid m_grid = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_images);
+
+        m_grid = (MyCustomGrid) findViewById(R.id.mg);
 
     }
 
@@ -44,6 +48,11 @@ public class ImagesActivity extends ActionBarActivity {
         InetHandler.getInstance().Start();
         FileHandler.getInstance().setContext(this);
 
+    }
+
+    public void invalidate() {
+       if(null!=m_grid)
+           m_grid.postInvalidate();
     }
 
 
