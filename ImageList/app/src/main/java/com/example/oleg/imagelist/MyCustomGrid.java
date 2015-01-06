@@ -121,6 +121,7 @@ public class MyCustomGrid extends View {
         int wcount = 0;
         int wsize = (m_vertical)?Constants.PORTRET_COUNT:Constants.LANSCAPE_COUNT;
 
+        m_distanceY = (m_distanceY<0)?0:m_distanceY;
 
         int widthCanvas = canvas.getWidth();
         int heightCanvas = canvas.getHeight();
@@ -162,21 +163,19 @@ public class MyCustomGrid extends View {
                 instPicture.freeLock();
                 currentHeight+=rect.height();
 
+
+                boolean IsItLastPosition = (currentHeight-heightCanvas<=m_distanceY);
+                boolean IsItLAstImage = (i+1==countImages);
+                m_distanceY = (IsItLastPosition&&IsItLAstImage)?currentHeight-heightCanvas:m_distanceY;
+
             }
             else {
-                 int x = 0;
                     break;
                 }
 
 
             Heights[wcount] = currentHeight+Constants.HGAP_IMAGES;
-           /* if(wcount==(wsize-1))
-            {
-                wcount = 0;
-                currentWidth = Constants.WGAP;
-            }
-            else
-                wcount++;*/
+
 
         }
     }
