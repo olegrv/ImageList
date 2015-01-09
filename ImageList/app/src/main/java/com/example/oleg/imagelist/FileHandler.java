@@ -22,8 +22,8 @@ public class FileHandler {
 
     }
 
-    private final int NOT_INIT_PICNUMPER = -1;
-    private int m_nLastPictureNumber = NOT_INIT_PICNUMPER;
+    private final int NOT_INIT_PICNUMBER = -1;
+    private int m_nLastPictureNumber = NOT_INIT_PICNUMBER;
     private int m_nLastPictureNumberNew = 0;
     private ArrayList<Integer> m_index = null;
 
@@ -89,7 +89,7 @@ public class FileHandler {
     }
 
     private void checkPictureNumber() {
-        if (NOT_INIT_PICNUMPER == m_nLastPictureNumber) {
+        if (NOT_INIT_PICNUMBER == m_nLastPictureNumber) {
             loadLastPictureNumber();
             loadIndex();
         }
@@ -189,7 +189,8 @@ public class FileHandler {
         return m_nLastPictureNumber;
     }
 
-    public synchronized void addPicture(InstPicture instPicture) {
+    public synchronized boolean addPicture(InstPicture instPicture) {
+        boolean res = true;
         checkPictureNumber();
         try {
 
@@ -242,8 +243,10 @@ public class FileHandler {
 
         } catch (IOException e)
         {
-            
+            res = false;
         }
+
+        return res;
 
     }
 

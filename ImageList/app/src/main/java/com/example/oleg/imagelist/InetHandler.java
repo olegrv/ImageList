@@ -175,7 +175,8 @@ public class InetHandler  {
                           break;
                      instPicture = getPicture(JSONText);
                      if(null!=instPicture)
-                     FileHandler.getInstance().addPicture(instPicture);
+                     if(!FileHandler.getInstance().addPicture(instPicture))
+                         break; // issue with writing files - we should stop
                      if(null != JSONText)
                            m_strUrl = getNextURL(JSONText);
                      JSONText = getJSON(m_strUrl);

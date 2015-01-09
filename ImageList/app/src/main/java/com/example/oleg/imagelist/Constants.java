@@ -9,7 +9,7 @@ public  class Constants {
     public final static String HASH_TAG = "umbrella";
     public static final long PERIOD_TO_TRAY_INET = 5000l;
     public static final int HGAP = 3;
-    public static  final int WGAP = 15;
+    public static final int WGAP = 15;
     public static final String SPLIT_TAGS_SYMBOL =";";
     public static final String LAST_TAG_FILE_NAME = "lastTag.txt";
     public static final String COUNT_FILE_NAME = "count.bin";

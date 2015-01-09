@@ -128,7 +128,7 @@ public class InstPicture {
         Paint paint = new Paint();
         newCanvas.drawBitmap(getBitmap(), 0, 0, paint);
         currentHeight += y_size + Constants.HGAP;
-        for (int j = getTags().size() - 1; j != 0; j--)
+        for (int j = 0; j <getTags().size(); j++)
 
         {
             Rect bounds = new Rect();
